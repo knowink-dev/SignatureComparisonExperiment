@@ -27,7 +27,7 @@ class ParseImage{
     var imagePixelsArray: [ImagePixel] = []
     
     /// Dictionary used to create the neighboring pixels for each pixel.
-    var pixelImageMap: [String:ImagePixel] = [:]
+    var pixelImageMap: [PixelCoordinate:ImagePixel] = [:]
     
     
     /// Parses an image pixel data of RGB and Monochrome. Image parser goes through 4 phases of destructing and constructing in order to form lines / vectors with measurable angles to be used for comparison.
@@ -173,7 +173,15 @@ struct Pixel {
     }
 }
 
+struct PixelCoordinate: Hashable {
+    let x: Int
+    let y: Int
+}
+
 class PixelVector{
+    var pixelPath: [ImagePixel] = []
+    var angle: Double = 0.0
+    var processed = false
     var startPixel: ImagePixel!
     var endPixel: ImagePixel!{
         didSet{
@@ -191,14 +199,8 @@ class PixelVector{
             } else{
                 angle = (atan((Double(secondPixel.yPos) - Double(firstPixel.yPos)) / (Double(secondPixel.xPos) - Double(firstPixel.xPos))) * (180 / Double.pi)) + 90
             }
-//            debugPrint("Anlge: \(angle)")
-
         }
     }
-    var pixelPath: [ImagePixel] = []
-    var angle: Double = 0.0
-    var processed = false
-    
 }
 
 class ImagePixel{
@@ -207,16 +209,12 @@ class ImagePixel{
     var xPos: Int
     var yPos: Int
     var pixelStatus: PixelStatus = .normal
-    var whitePixelNeigbors = 0
     var neighbors: [ImagePixel] = []
     
     var topLeftPix: ImagePixel?{
         didSet{
             if let pixel = topLeftPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -224,9 +222,6 @@ class ImagePixel{
         didSet{
             if let pixel = topPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -234,9 +229,6 @@ class ImagePixel{
         didSet{
             if let pixel = topRightPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -244,9 +236,6 @@ class ImagePixel{
         didSet{
             if let pixel = rightPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -254,9 +243,6 @@ class ImagePixel{
         didSet{
             if let pixel = bottomRightPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -264,9 +250,6 @@ class ImagePixel{
         didSet{
             if let pixel = bottomPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -274,9 +257,6 @@ class ImagePixel{
         didSet{
             if let pixel = bottomLeftPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }
@@ -284,9 +264,6 @@ class ImagePixel{
         didSet{
             if let pixel = leftPix{
                 neighbors.append(pixel)
-                if pixel.color == .white {whitePixelNeigbors = whitePixelNeigbors + 1}
-            } else{
-                whitePixelNeigbors = whitePixelNeigbors + 1
             }
         }
     }

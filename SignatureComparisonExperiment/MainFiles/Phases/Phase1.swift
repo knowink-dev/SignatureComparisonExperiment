@@ -25,28 +25,18 @@ internal extension ParseImage{
                 let a = bytes[offset + 3]
                 
                 var color: PixelColor = .clear
-                
-                //Boundry Check: If pixel is on the boundry then turn it white.
-                if x == 0 || x == cgImage.width - 1 || y == 0 || y == cgImage.height - 1 {
+                let newPixel = ImagePixel(color, xPos: x, yPos: y)
+                if r == 0 && g == 0 && b == 0 && a > 0{ //If its already black
+                    color = .black
+                    imagePixelsArray.append(newPixel)
+                }else{ //White
                     color = .white
-                    let newPixel = ImagePixel(color, xPos: x, yPos: y)
-                    pixelImageMap["\(x)-\(y)"] = newPixel
-                    imagePixelsPhase1[y][x] = color.rawValue
-                    continue
-                } else {
-                    let newPixel = ImagePixel(color, xPos: x, yPos: y)
-                    if r == 0 && g == 0 && b == 0 && a >= 200{ //If its already black
-                        color = .black
-                        imagePixelsArray.append(newPixel)
-                    } else{ //White
-                        color = .white
-                    }
-                    
-                    newPixel.color = color
-                    imagePixelsPhase1[y][x] = color.rawValue
-                    pixelImageMap["\(x)-\(y)"] = newPixel
                 }
+                newPixel.color = color
+                imagePixelsPhase1[y][x] = color.rawValue
+                pixelImageMap[PixelCoordinate(x: x, y: y)] = newPixel
             }
         }
     }
 }
+

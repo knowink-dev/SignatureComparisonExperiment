@@ -153,18 +153,19 @@ class ViewController: UIViewController {
                                                   true) { result,
                                                           parsedImages in
                     DispatchQueue.main.async {
+                        sender.isEnabled = true
+                        self.loader.isHidden = true
+                        self.loader.stopAnimating()
+                        self.signatureView.isUserInteractionEnabled = true
+                        self.lblSignHere.isHidden = false
+                        self.secondaryLoader.isHidden = true
+                        self.secondaryLoader.stopAnimating()
+                        self.secondarySignatureView.isUserInteractionEnabled = true
+                        self.secondaryLblSignHere.isHidden = false
+                        
                         switch result{
                         case .success(let percentage):
                             if let parsedImgs = parsedImages, parsedImgs.count > 0{
-                                sender.isEnabled = true
-                                self.loader.isHidden = true
-                                self.loader.stopAnimating()
-                                self.signatureView.isUserInteractionEnabled = true
-                                self.lblSignHere.isHidden = false
-                                self.secondaryLoader.isHidden = true
-                                self.secondaryLoader.stopAnimating()
-                                self.secondarySignatureView.isUserInteractionEnabled = true
-                                self.secondaryLblSignHere.isHidden = false
                                 self.currentTopParsedImgObj = parsedImgs.first
                                 self.imgView.image = self.currentTopParsedImgObj?.debugImageDic[.phase3]
                                 self.currentBottomParsedImgObj = parsedImgs.last

@@ -45,37 +45,37 @@ internal extension ParseImage{
     ///   - yMax: Max height of the Image
     ///   - xMax: Max width of the Image
     ///   - currentPixel: Current pixel having it's neighbors set.
-    func setPixelNeighbors(_ imgPixels: [String:ImagePixel],_ x: Int,_ y: Int,_ yMax: Int,_ xMax: Int,_ currentPixel: ImagePixel){
+    func setPixelNeighbors(_ imgPixels: [PixelCoordinate:ImagePixel],_ x: Int,_ y: Int,_ yMax: Int,_ xMax: Int,_ currentPixel: ImagePixel){
         if x != 0 && y != 0{
-            currentPixel.topLeftPix = imgPixels["\(x - 1)-\(y - 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y - 1)]
         }
         
         if y != 0{
-            currentPixel.topPix = imgPixels["\(x)-\(y - 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x, y: y - 1)]
         }
         
         if x < xMax && y != 0{
-            currentPixel.topRightPix = imgPixels["\(x + 1)-\(y - 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y - 1)]
         }
         
         if x < xMax{
-            currentPixel.rightPix = imgPixels["\(x + 1)-\(y)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y)]
         }
         
         if x < xMax && y < yMax{
-            currentPixel.bottomRightPix = imgPixels["\(x + 1)-\(y + 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y + 1)]
         }
         
         if y < yMax{
-            currentPixel.bottomPix = imgPixels["\(x)-\(y + 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x, y: y + 1)]
         }
         
         if x != 0 && y < yMax{
-            currentPixel.bottomLeftPix = imgPixels["\(x - 1)-\(y + 1)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y + 1)]
         }
         
         if x != 0 {
-            currentPixel.leftPix = imgPixels["\(x - 1)-\(y)"]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y)]
         }
     }
 }
