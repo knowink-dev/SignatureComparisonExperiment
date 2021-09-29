@@ -27,7 +27,7 @@ internal extension ParseImage{
                 processLine(pixelImage: currentPixel, line: vector, &imagePixelsPhase4)
                 let lastPixel = vector.pixelPath.last
                 vector.endPixel = lastPixel
-                imagePixelsPhase4[lastPixel?.yPos ?? 0][lastPixel?.xPos ?? 0] = PixelColor.white.rawValue
+                imagePixelsPhase4[lastPixel?.yPos ?? 0][lastPixel?.xPos ?? 0] = PixelColor.green.rawValue
                 if vector.pixelPath.count > 14{
                     vectors.append(vector)
                 }
@@ -57,7 +57,7 @@ internal extension ParseImage{
                     return
                 }
                 pixelToProcess.pixelStatus = .processed
-                imgPixels[pixelToProcess.yPos][pixelToProcess.xPos] = PixelColor.knowInkYellow.rawValue
+                imgPixels[pixelToProcess.yPos][pixelToProcess.xPos] = PixelColor.darkBlue.rawValue
                 line.pixelPath.append(pixelToProcess)
                 processLine(pixelImage: pixelToProcess, line: line, &imgPixels)
             } else if nextNeighbor.count == 0{

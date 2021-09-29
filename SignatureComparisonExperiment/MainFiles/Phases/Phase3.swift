@@ -39,7 +39,9 @@ internal extension ParseImage{
                 currentPixel.pixelStatus = .restoredLeft
                 currentPixel.color = .black
                 currentPixel.debugColor = .red
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.red.rawValue
+                #endif
             }
 
             /* RESTORE East Facing Pixels
@@ -62,7 +64,9 @@ internal extension ParseImage{
                 currentPixel.pixelStatus = .restoredLeft
                 currentPixel.color = .black
                 currentPixel.debugColor = .yellow
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.yellow.rawValue
+                #endif
 
             } else if currentPixel.color == .white,
               currentPixel.pixelStatus == .deleted,
@@ -78,7 +82,9 @@ internal extension ParseImage{
                 currentPixel.pixelStatus = .maybeRestoreLeft
                 currentPixel.color = .white
                 currentPixel.debugColor = .gray
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.gray.rawValue
+                #endif
 
             } else if currentPixel.color == .black,
              (currentPixel.pixelStatus == .normal ||
@@ -96,11 +102,13 @@ internal extension ParseImage{
                 currentPixel.leftPix?.pixelStatus = .deleted
                 currentPixel.leftPix?.color = .white
                 currentPixel.leftPix?.debugColor = .orange
-                imagePixelsPhase3[currentPixel.yPos][currentPixel.leftPix?.xPos ?? 0] = PixelColor.orange.rawValue
                 currentPixel.color = .white
                 currentPixel.debugColor = .orange
                 currentPixel.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
+                imagePixelsPhase3[currentPixel.yPos][currentPixel.leftPix?.xPos ?? 0] = PixelColor.orange.rawValue
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.orange.rawValue
+                #endif
             }
 
             /* RESTORE South East Pixels
@@ -136,7 +144,9 @@ internal extension ParseImage{
                 currentPixel.pixelStatus = .restoredRight
                 currentPixel.color = .black
                 currentPixel.debugColor = .blue
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.blue.rawValue
+                #endif
             }
 
             /* DELETE Unused Pixel Connectors
@@ -158,13 +168,17 @@ internal extension ParseImage{
                 currentPixel.rightPix?.color = .white
                 currentPixel.debugColor = .pink
                 currentPixel.rightPix?.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.rightPix?.yPos ?? 0][currentPixel.rightPix?.xPos ?? 0] = PixelColor.pink.rawValue
+                #endif
 
                 // DELETE potentially bad intersection result
                 if currentPixel.rightPix?.bottomRightPix?.color == .black{
                     currentPixel.color = .white
                     currentPixel.pixelStatus = .deleted
+                    #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.pink.rawValue
+                    #endif
                 }
                 continue
             }
@@ -179,7 +193,9 @@ internal extension ParseImage{
                 currentPixel.color = .white
                 currentPixel.debugColor = .teal
                 currentPixel.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.teal.rawValue
+                #endif
             }
 
             /* RESTORE East Facing Pixels
@@ -199,10 +215,12 @@ internal extension ParseImage{
                !(currentPixel.rightPix?.color == .black &&
                 currentPixel.rightPix?.topRightPix?.color == .black){
 
-                 currentPixel.pixelStatus = .restoredRight
-                 currentPixel.color = .black
+                currentPixel.pixelStatus = .restoredRight
+                currentPixel.color = .black
                 currentPixel.debugColor = .green
-                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.green.rawValue
+                #if DEBUG || FAKE_RELEASE
+                imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.green.rawValue
+                #endif
 
             } else if currentPixel.color == .white,
                 currentPixel.pixelStatus == .deleted,
@@ -218,7 +236,9 @@ internal extension ParseImage{
                 currentPixel.pixelStatus = .maybeRestoreRight
                 currentPixel.color = .white
                 currentPixel.debugColor = .gray
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.gray.rawValue
+                #endif
 
             } else if currentPixel.color == .black,
                (currentPixel.pixelStatus == .normal ||
@@ -232,15 +252,18 @@ internal extension ParseImage{
                 currentPixel.bottomRightPix?.color == .white,
                 currentPixel.bottomPix?.color == .black,
                 currentPixel.bottomLeftPix?.color == .white{
-
+                
                 currentPixel.leftPix?.pixelStatus = .restoredRight
                 currentPixel.leftPix?.color = .black
                 currentPixel.leftPix?.color = .green
-                imagePixelsPhase3[currentPixel.yPos][currentPixel.leftPix?.xPos ?? currentPixel.xPos - 1] = PixelColor.green.rawValue
                 currentPixel.color = .white
                 currentPixel.debugColor = .orange
                 currentPixel.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
+                imagePixelsPhase3[currentPixel.yPos][currentPixel.leftPix?.xPos ?? currentPixel.xPos - 1] = PixelColor.green.rawValue
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.orange.rawValue
+                #endif
+                
                 if currentPixel.bottomPix?.color == .black{
                     currentPixel.bottomPix?.pixelStatus = .maybeDeleteBottomLeft
                 }
@@ -264,7 +287,9 @@ internal extension ParseImage{
                 currentPixel.color = .white
                 currentPixel.debugColor = .darkBlue
                 currentPixel.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.darkBlue.rawValue
+                #endif
             }
 
             /* DELETE Top Pixel Connector
@@ -285,7 +310,9 @@ internal extension ParseImage{
                 currentPixel.color = .white
                 currentPixel.debugColor = .purple
                 currentPixel.pixelStatus = .deleted
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.purple.rawValue
+                #endif
             }
 
             /* DELETE West Pixel Connector
@@ -317,7 +344,9 @@ internal extension ParseImage{
                     currentPixel.color = .white
                     currentPixel.debugColor = .lightGreen
                     currentPixel.pixelStatus = .deleted
+                    #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.lightGreen.rawValue
+                    #endif
                 }
 
                 if currentPixel.bottomRightPix?.color == .white,
@@ -359,7 +388,9 @@ internal extension ParseImage{
                     currentPixel.color = .white
                     currentPixel.debugColor = .darkGreen
                     currentPixel.pixelStatus = .deleted
+                    #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.darkGreen.rawValue
+                    #endif
 
                 } else if currentPixel.bottomRightPix?.color == .white,
                           currentPixel.bottomPix?.color == .black,
@@ -408,12 +439,16 @@ internal extension ParseImage{
                     currentPixel.color = .white
                     currentPixel.debugColor = .gold
                     currentPixel.pixelStatus = .deleted
+                    #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.gold.rawValue
+                    #endif
                     for pixel in intersectingNeighbors{
                         pixel.color = .white
                         pixel.debugColor = .grayBlue
                         currentPixel.pixelStatus = .permanentlyDeleted
+                        #if DEBUG || FAKE_RELEASE
                         imagePixelsPhase3[pixel.yPos][pixel.xPos] = PixelColor.grayBlue.rawValue
+                        #endif
                     }
                 }
             }

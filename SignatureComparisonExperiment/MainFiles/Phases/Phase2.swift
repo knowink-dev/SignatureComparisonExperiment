@@ -28,7 +28,9 @@ internal extension ParseImage{
                 if imagePixelsPhase1[currentPixel.yPos][currentPixel.xPos + 1] == black {
                     currentPixel.color = white
                     currentPixel.pixelStatus = deletedStatus
+                    #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = brown
+                    #endif
                 }
             }
 

@@ -14,11 +14,13 @@ class ParseImage{
     /// Phase 1 Debug Image
     var imagePixelsPhase1: [[UInt32]]!
     
+    #if DEBUG || FAKE_RELEASE
     /// Phase 2 Debug Image
     var imagePixelsPhase2: [[UInt32]]!
     
     /// Phase 3 Debug Image
     var imagePixelsPhase3: [[UInt32]]!
+    #endif
     
     /// Phase 4 Debug Image
     var imagePixelsPhase4: [[UInt32]]!
@@ -33,9 +35,8 @@ class ParseImage{
     /// Parses an image pixel data of RGB and Monochrome. Image parser goes through 4 phases of destructing and constructing in order to form lines / vectors with measurable angles to be used for comparison.
     /// - Parameters:
     ///   - inputImage: Image to parse
-    ///   - runInDebugMode: Running in debug mode will provide the images of each phase for debugging.
     /// - Returns: Image object that was parsed during execution.
-    func parseImage(inputImage: UIImage, runInDebugMode: Bool = false) -> Result<ParsedImage>{
+    func parseImage(inputImage: UIImage) -> Result<ParsedImage>{
         
         //MARK: - Init Vars
         guard let cgImage = inputImage.cgImage,
@@ -49,45 +50,74 @@ class ParseImage{
                 repeating: UInt32.max,
                 count: cgImage.width),
             count: cgImage.height)
+        #if DEBUG || FAKE_RELEASE
         imagePixelsPhase2 = imagePixelsPhase1
         imagePixelsPhase3 = imagePixelsPhase2
-        imagePixelsPhase4 = imagePixelsPhase3
+        #endif
+        imagePixelsPhase4 = imagePixelsPhase1
+        
         let parsedImageObj = ParsedImage()
 
         //MARK: - Phase 1 - Converts image to black and white pixels only.
+        #if DEBUG || FAKE_RELEASE
         var phaseOneStart: CFAbsoluteTime = 0
         var phase1Interval: Double = 0
+        #endif
+        
         if cgImage.colorSpace?.model == .rgb || cgImage.colorSpace?.model == .monochrome{
+            #if DEBUG || FAKE_RELEASE
             phaseOneStart = CFAbsoluteTimeGetCurrent()
+            #endif
+            
             parseImagePhase1(cgImage, bytes)
+            #if DEBUG || FAKE_RELEASE
             phase1Interval = Double(CFAbsoluteTimeGetCurrent() - phaseOneStart)
+            #endif
+            
         } else{
             return .failure(.invalidImageSupplied("Image is not in the correct format. Acceptable formats include RGBA and MonoChrome"))
         }
         
         //MARK: - Phase 2 - Delete all neighbor pixels to the left.
+        #if DEBUG || FAKE_RELEASE
         imagePixelsPhase2 = imagePixelsPhase1
         let phaseTwoStart = CFAbsoluteTimeGetCurrent()
+        #endif
+        
         parseImagePhase2(cgImage)
+        #if DEBUG || FAKE_RELEASE
         let phase2Interval = Double(CFAbsoluteTimeGetCurrent() - phaseTwoStart)
+        #endif
         
         //MARK: - Phase 3 - Transform image signature into vectors.
+        #if DEBUG || FAKE_RELEASE
         imagePixelsPhase3 = imagePixelsPhase2
         let phaseThreeStart = CFAbsoluteTimeGetCurrent()
+        #endif
+        
         parseImagePhase3()
+        #if DEBUG || FAKE_RELEASE
         let phase3Interval = Double(CFAbsoluteTimeGetCurrent() - phaseThreeStart)
-                
+        #endif
+        
         //MARK: - Phase 4 - Process all vectors and mapped them to their appropriate quadrants.
+        #if DEBUG || FAKE_RELEASE
         let phaseFourStart = CFAbsoluteTimeGetCurrent()
+        #endif
+        
         parsedImageObj.vectors = parseImagePhase4()
+        #if DEBUG || FAKE_RELEASE
         let phase4Interval: Double = Double(CFAbsoluteTimeGetCurrent() - phaseFourStart)
+        #endif
         
         //MARK: - Debug Info
+        #if DEBUG || FAKE_RELEASE
         let secondsPhase1 = (String(format: "%.4f", phase1Interval))
         let secondsPhase2 = (String(format: "%.4f", phase2Interval))
         let secondsPhase3 = (String(format: "%.4f", phase3Interval))
         let secondsPhase4 = (String(format: "%.4f", phase4Interval))
         let totalTime = (String(format: "%.4f", phase1Interval + phase2Interval + phase3Interval + phase4Interval))
+        
         debugPrint("Phase1: \(secondsPhase1)")
         debugPrint("Phase2: \(secondsPhase2)")
         debugPrint("Phase3: \(secondsPhase3)")
@@ -95,12 +125,12 @@ class ParseImage{
         debugPrint("Total: \(totalTime)")
         debugPrint("")
         
-        if runInDebugMode{
-            parsedImageObj.debugImageDic[.phase1] = generateDebugImage(pixelArray: imagePixelsPhase1, cgImage: cgImage)
-            parsedImageObj.debugImageDic[.phase2] = generateDebugImage(pixelArray: imagePixelsPhase2, cgImage: cgImage)
-            parsedImageObj.debugImageDic[.phase3] = generateDebugImage(pixelArray: imagePixelsPhase3, cgImage: cgImage)
-            parsedImageObj.debugImageDic[.phase4] = generateDebugImage(pixelArray: imagePixelsPhase4, cgImage: cgImage)
-        }
+        parsedImageObj.debugImageDic[.phase1] = generateDebugImage(pixelArray: imagePixelsPhase1, cgImage: cgImage)
+        parsedImageObj.debugImageDic[.phase2] = generateDebugImage(pixelArray: imagePixelsPhase2, cgImage: cgImage)
+        parsedImageObj.debugImageDic[.phase3] = generateDebugImage(pixelArray: imagePixelsPhase3, cgImage: cgImage)
+        parsedImageObj.debugImageDic[.phase4] = generateDebugImage(pixelArray: imagePixelsPhase4, cgImage: cgImage)
+        #endif
+        
         return .success(parsedImageObj)
     }
 }

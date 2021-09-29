@@ -149,9 +149,7 @@ class ViewController: UIViewController {
                 self.comparePressed = true
                 
                 SignatureDriver.compareSignatures(sourceImg,
-                                                  secondaryImg,
-                                                  true) { result,
-                                                          parsedImages in
+                                                  secondaryImg) { result, parsedImages in
                     DispatchQueue.main.async {
                         sender.isEnabled = true
                         self.loader.isHidden = true
