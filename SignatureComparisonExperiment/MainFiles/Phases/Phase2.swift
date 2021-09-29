@@ -13,16 +13,22 @@ internal extension ParseImage{
     /// - Delete all neighbor pixels to the left, in order to create single connecting lines and handle different stroke sizes.
     /// - Parameter cgImage: The image signature in Core Graphic format
     func parseImagePhase2(_ cgImage: CGImage){
+        let xPositionBoundary = cgImage.width - 1
+        let yPositionBoundary = cgImage.height - 1
+        let black = PixelColor.black.rawValue
+        let white = PixelColor.white
+        let brown = PixelColor.brown.rawValue
+        let deletedStatus = PixelStatus.deleted
         for currentPixel in imagePixelsArray{
-            if (currentPixel.xPos > 0 && currentPixel.xPos < cgImage.width - 1)
-                && (currentPixel.yPos > 0 && currentPixel.yPos < cgImage.height - 1) {
+            if (currentPixel.xPos > 0 && currentPixel.xPos < xPositionBoundary)
+                && (currentPixel.yPos > 0 && currentPixel.yPos < yPositionBoundary) {
                 /* DELETE Current Pixel if pixel has neighbor pixel to the right.
                     ex:    @ - *
                 */
-                if imagePixelsPhase1[currentPixel.yPos][currentPixel.xPos + 1] == PixelColor.black.rawValue {
-                    currentPixel.color = .white
-                    currentPixel.pixelStatus = .deleted
-                    imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = PixelColor.brown.rawValue
+                if imagePixelsPhase1[currentPixel.yPos][currentPixel.xPos + 1] == black {
+                    currentPixel.color = white
+                    currentPixel.pixelStatus = deletedStatus
+                    imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = brown
                 }
             }
 
@@ -30,8 +36,8 @@ internal extension ParseImage{
                 pixelImageMap,
                 currentPixel.xPos,
                 currentPixel.yPos,
-                imagePixelsPhase1.count - 1,
-                imagePixelsPhase1[currentPixel.yPos].count - 1,
+                yPositionBoundary,
+                xPositionBoundary,
                 currentPixel)
         }
     }
@@ -45,37 +51,44 @@ internal extension ParseImage{
     ///   - yMax: Max height of the Image
     ///   - xMax: Max width of the Image
     ///   - currentPixel: Current pixel having it's neighbors set.
-    func setPixelNeighbors(_ imgPixels: [PixelCoordinate:ImagePixel],_ x: Int,_ y: Int,_ yMax: Int,_ xMax: Int,_ currentPixel: ImagePixel){
+    func setPixelNeighbors(
+        _ imgPixels: [PixelCoordinate:ImagePixel],
+        _ x: Int,
+        _ y: Int,
+        _ yMax: Int,
+        _ xMax: Int,
+        _ currentPixel: ImagePixel) {
+        
         if x != 0 && y != 0{
             currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y - 1)]
         }
         
         if y != 0{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x, y: y - 1)]
+            currentPixel.topPix = imgPixels[PixelCoordinate(x: x, y: y - 1)]
         }
         
         if x < xMax && y != 0{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y - 1)]
+            currentPixel.topRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y - 1)]
         }
         
         if x < xMax{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y)]
+            currentPixel.rightPix = imgPixels[PixelCoordinate(x: x + 1, y: y)]
         }
         
         if x < xMax && y < yMax{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x + 1, y: y + 1)]
+            currentPixel.bottomRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y + 1)]
         }
         
         if y < yMax{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x, y: y + 1)]
+            currentPixel.bottomPix = imgPixels[PixelCoordinate(x: x, y: y + 1)]
         }
         
         if x != 0 && y < yMax{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y + 1)]
+            currentPixel.bottomLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y + 1)]
         }
         
         if x != 0 {
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y)]
+            currentPixel.leftPix = imgPixels[PixelCoordinate(x: x - 1, y: y)]
         }
     }
 }

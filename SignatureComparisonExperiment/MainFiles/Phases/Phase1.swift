@@ -16,25 +16,37 @@ internal extension ParseImage{
     ///   - bytes: Pointer to the image data
     func parseImagePhase1(_ cgImage: CGImage, _ bytes: UnsafePointer<UInt8>){
         let bytesPerPixel = cgImage.bitsPerPixel / cgImage.bitsPerComponent
-        for y in 0 ..< cgImage.height {
-            for x in 0 ..< cgImage.width {
+        let black = PixelColor.black
+        let white = PixelColor.white
+        let width = cgImage.width
+        let height = cgImage.height
+        let xBoundary = width - 1
+        let yBoundary = height - 1
+        
+        for y in 0 ..< height {
+            for x in 0 ..< width {
+                //check with conditions to make sure it is a black pixel
                 let offset = (y * cgImage.bytesPerRow) + (x * bytesPerPixel)
-                let r = bytes[offset]
-                let g = bytes[offset + 1]
-                let b = bytes[offset + 2]
-                let a = bytes[offset + 3]
                 
-                var color: PixelColor = .clear
-                let newPixel = ImagePixel(color, xPos: x, yPos: y)
-                if r == 0 && g == 0 && b == 0 && a > 0{ //If its already black
-                    color = .black
-                    imagePixelsArray.append(newPixel)
-                }else{ //White
-                    color = .white
+                if x == 0 || y == 0 || y == yBoundary || x == xBoundary {
+                    let newPixel = ImagePixel(white, xPos: x, yPos: y)
+                    pixelImageMap[PixelCoordinate(x: x, y: y)] = newPixel
+                    continue
                 }
-                newPixel.color = color
-                imagePixelsPhase1[y][x] = color.rawValue
+                
+                let r = bytes[offset]
+                if r != 0 { continue }
+                let g = bytes[offset + 1]
+                if g != 0 { continue }
+                let b = bytes[offset + 2]
+                if b != 0 { continue }
+                let a = bytes[offset + 3]
+                if a <= 0 { continue }
+                
+                let newPixel = ImagePixel(black, xPos: x, yPos: y)
+                imagePixelsArray.append(newPixel)
                 pixelImageMap[PixelCoordinate(x: x, y: y)] = newPixel
+                imagePixelsPhase1[y][x] = black.rawValue
             }
         }
     }

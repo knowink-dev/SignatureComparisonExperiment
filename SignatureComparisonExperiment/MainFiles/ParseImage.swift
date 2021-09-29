@@ -38,7 +38,6 @@ class ParseImage{
     func parseImage(inputImage: UIImage, runInDebugMode: Bool = false) -> Result<ParsedImage>{
         
         //MARK: - Init Vars
-        let startTiming = CFAbsoluteTimeGetCurrent()
         guard let cgImage = inputImage.cgImage,
               let data = cgImage.dataProvider?.data,
               let bytes = CFDataGetBytePtr(data)
@@ -47,7 +46,7 @@ class ParseImage{
         }
         imagePixelsPhase1 = [[UInt32]](
             repeating: [UInt32](
-                repeating: 0,
+                repeating: UInt32.max,
                 count: cgImage.width),
             count: cgImage.height)
         imagePixelsPhase2 = imagePixelsPhase1
@@ -56,36 +55,45 @@ class ParseImage{
         let parsedImageObj = ParsedImage()
 
         //MARK: - Phase 1 - Converts image to black and white pixels only.
+        var phaseOneStart: CFAbsoluteTime = 0
+        var phase1Interval: Double = 0
         if cgImage.colorSpace?.model == .rgb || cgImage.colorSpace?.model == .monochrome{
+            phaseOneStart = CFAbsoluteTimeGetCurrent()
             parseImagePhase1(cgImage, bytes)
+            phase1Interval = Double(CFAbsoluteTimeGetCurrent() - phaseOneStart)
         } else{
             return .failure(.invalidImageSupplied("Image is not in the correct format. Acceptable formats include RGBA and MonoChrome"))
         }
-        let phase1Interval: Double = Double(CFAbsoluteTimeGetCurrent() - startTiming)
         
         //MARK: - Phase 2 - Delete all neighbor pixels to the left.
         imagePixelsPhase2 = imagePixelsPhase1
+        let phaseTwoStart = CFAbsoluteTimeGetCurrent()
         parseImagePhase2(cgImage)
-        let phase2Interval: Double = Double(CFAbsoluteTimeGetCurrent() - startTiming)
+        let phase2Interval = Double(CFAbsoluteTimeGetCurrent() - phaseTwoStart)
         
         //MARK: - Phase 3 - Transform image signature into vectors.
         imagePixelsPhase3 = imagePixelsPhase2
+        let phaseThreeStart = CFAbsoluteTimeGetCurrent()
         parseImagePhase3()
-        let phase3Interval: Double = Double(CFAbsoluteTimeGetCurrent() - startTiming)
+        let phase3Interval = Double(CFAbsoluteTimeGetCurrent() - phaseThreeStart)
                 
         //MARK: - Phase 4 - Process all vectors and mapped them to their appropriate quadrants.
+        let phaseFourStart = CFAbsoluteTimeGetCurrent()
         parsedImageObj.vectors = parseImagePhase4()
-        let phase4Interval: Double = Double(CFAbsoluteTimeGetCurrent() - startTiming)
+        let phase4Interval: Double = Double(CFAbsoluteTimeGetCurrent() - phaseFourStart)
         
         //MARK: - Debug Info
         let secondsPhase1 = (String(format: "%.4f", phase1Interval))
         let secondsPhase2 = (String(format: "%.4f", phase2Interval))
         let secondsPhase3 = (String(format: "%.4f", phase3Interval))
         let secondsPhase4 = (String(format: "%.4f", phase4Interval))
+        let totalTime = (String(format: "%.4f", phase1Interval + phase2Interval + phase3Interval + phase4Interval))
         debugPrint("Phase1: \(secondsPhase1)")
         debugPrint("Phase2: \(secondsPhase2)")
         debugPrint("Phase3: \(secondsPhase3)")
         debugPrint("Phase4: \(secondsPhase4)")
+        debugPrint("Total: \(totalTime)")
+        debugPrint("")
         
         if runInDebugMode{
             parsedImageObj.debugImageDic[.phase1] = generateDebugImage(pixelArray: imagePixelsPhase1, cgImage: cgImage)

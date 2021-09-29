@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         signatureView.delegate = self
         originalSignatureViewHeight = signatureView.frame.height
         secondarySignatureView.drawColor = .black
-        secondarySignatureView.drawWidth = 3
+        secondarySignatureView.drawWidth = 6
         secondarySignatureView.delegate = self
         
         imgScrollView.delegate = self

@@ -381,19 +381,35 @@ internal extension ParseImage{
                                *
 
             */
-            let coloredPixelNeighbors = currentPixel.neighbors.filter({$0.color == .black})
-            let notColoredPixelNeighbors = currentPixel.neighbors.filter({$0.color == .white && $0.pixelStatus == .deleted})
+            var coloredPixelNeighbors = [ImagePixel]()
+            for pixel in currentPixel.neighbors {
+                if pixel.color == .black {
+                    coloredPixelNeighbors.append(pixel)
+                }
+            }
+            var notColoredPixelNeighbors = [ImagePixel]()
+            for pixel in currentPixel.neighbors {
+                if pixel.color == .white && pixel.pixelStatus == .deleted {
+                    notColoredPixelNeighbors.append(pixel)
+                }
+            }
             if coloredPixelNeighbors.count >= 2,
                notColoredPixelNeighbors.count >= 4,
                currentPixel.color == .black {
-                let intsectingNeighbors = checkNeighborsForIntersection(currentPixel: currentPixel)
-                if intsectingNeighbors.count >= 3,
-                   intsectingNeighbors.filter({$0.pixelStatus == .restoredRight}).count < 2{
+                let intersectingNeighbors = checkNeighborsForIntersection(currentPixel: currentPixel)
+                var restoredRightCount = 0
+                for neighbor in intersectingNeighbors {
+                    if neighbor.pixelStatus == .restoredRight {
+                        restoredRightCount += 1
+                    }
+                }
+                if intersectingNeighbors.count >= 3,
+                   restoredRightCount < 2{
                     currentPixel.color = .white
                     currentPixel.debugColor = .gold
                     currentPixel.pixelStatus = .deleted
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.gold.rawValue
-                    for pixel in intsectingNeighbors{
+                    for pixel in intersectingNeighbors{
                         pixel.color = .white
                         pixel.debugColor = .grayBlue
                         currentPixel.pixelStatus = .permanentlyDeleted
