@@ -316,12 +316,6 @@ class ImagePixel{
         return neighbors.first(where: {$0.pixelStatus == .processed})
     }
     
-    
-    func processPixelNeighbors() -> [ImagePixel]{
-        return neighbors.filter({$0.color == .black && $0.pixelStatus != .processed})
-    }
-    
-    
     func canBeStartPixel() -> Bool{
         if neighbors.filter({$0.color == .black}).count == 1{
             return true
