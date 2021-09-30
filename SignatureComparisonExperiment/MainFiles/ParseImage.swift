@@ -105,7 +105,7 @@ class ParseImage{
         let phaseFourStart = CFAbsoluteTimeGetCurrent()
         #endif
         
-        parsedImageObj.vectors = parseImagePhase4()
+        parsedImageObj.vectors = parseImagePhase4(cgImage.height)
         #if DEBUG || FAKE_RELEASE
         let phase4Interval: Double = Double(CFAbsoluteTimeGetCurrent() - phaseFourStart)
         #endif

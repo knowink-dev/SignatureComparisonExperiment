@@ -11,9 +11,12 @@ import UIKit
 internal extension ParseImage{
     
     /// - Process all lines and turn them into vectors with vertices.
+    /// - Parameter imgHeight: The height of the current image used for trimming the vectors length
     /// - Returns: The collection of image vectors from processing the lines, and any silent errors that were recogonized while creating vectors.
-    func parseImagePhase4() -> [PixelVector]{
+    func parseImagePhase4(_ imgHeight: Int) -> [PixelVector]{
         var vectors: [PixelVector] = []
+        let vectorTrimmerLength = Int(round(Double(imgHeight) * 0.02))
+        let vectorTrimmer = (vectorTrimmerLength <= 5 ? 5 : vectorTrimmerLength >= 15 ? 15 : vectorTrimmerLength)
         for currentPixel in imagePixelsArray{
             //Convert pixel lines into vectors
             if currentPixel.color == .black,
@@ -28,7 +31,7 @@ internal extension ParseImage{
                 let lastPixel = vector.pixelPath.last
                 vector.endPixel = lastPixel
                 imagePixelsPhase4[lastPixel?.yPos ?? 0][lastPixel?.xPos ?? 0] = PixelColor.green.rawValue
-                if vector.pixelPath.count > 14{
+                if vector.pixelPath.count > vectorTrimmer{
                     vectors.append(vector)
                 }
                 continue
