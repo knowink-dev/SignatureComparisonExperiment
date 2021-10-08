@@ -53,12 +53,12 @@ public class SignatureDriver{
         ) -> Void) {
         
         let parseImgQueue = OperationQueue()
-        parseImgQueue.maxConcurrentOperationCount = 2
         var primaryImgObj: ParsedImage?
         var secondaryImgObj: ParsedImage?
+        let overallTimeStart: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
            
         DispatchQueue.global().async {
-            let primaryBlock = BlockOperation{
+            parseImgQueue.addOperation {
                 let imgParser = ParseImage()
                 let result = imgParser.parseImage(inputImage: primarySignature)
                 switch result {
@@ -74,7 +74,7 @@ public class SignatureDriver{
                 }
             }
             
-            let secondaryBlock = BlockOperation{
+            parseImgQueue.addOperation {
                 let imgParser = ParseImage()
                 let result = imgParser.parseImage(inputImage: secondarySignature)
                 switch result {
@@ -89,7 +89,7 @@ public class SignatureDriver{
                     }
                 }
             }
-            parseImgQueue.addOperations([primaryBlock, secondaryBlock], waitUntilFinished: true)
+            parseImgQueue.waitUntilAllOperationsAreFinished()
 
             if let primaryImage = primaryImgObj, let secondaryImage = secondaryImgObj{
                 var overallPercentage = 0.0
@@ -106,6 +106,10 @@ public class SignatureDriver{
                         handler(.failure(Errors.noLinesRecognized(image: .secondary)), nil)
                     }
                 }
+                #if DEBUG || FAKE_RELEASE
+                let overallTimeEnd  = Double(CFAbsoluteTimeGetCurrent() - overallTimeStart)
+                debugPrint("Overall Time: \(overallTimeEnd)")
+                #endif
                 handler(.success(overallPercentage), [primaryImage, secondaryImage])
             } else {
                 handler(.failure(Errors.emptyParsedImages), nil)
@@ -123,17 +127,51 @@ private extension SignatureDriver{
     /// - Returns: Confidence level for the signature comparison.
     class func computePercentage(numImg: ParsedImage, denImg: ParsedImage) -> Double{
         var totalPercentage = 0.0
-        for numVector in numImg.vectors{
-            if let denVector = denImg.vectors.min(by: {abs($0.angle - numVector.angle) < abs($1.angle - numVector.angle)}){
+        let sortedNumVectors = numImg.vectors.sorted(by: {$0.minXPos < $1.minXPos})
+        let sortedDenVectors = denImg.vectors.sorted(by: {$0.minXPos < $1.minXPos})
+        for (index, numVector) in sortedNumVectors.enumerated(){
+            let nearestDenVectors = findNearestVectors(from: index, sortedDenVectors: sortedDenVectors)
+            if let nearestDenVector = nearestDenVectors.filter({!$0.processed}).min(by: {abs($0.angle - numVector.angle) < abs($1.angle - numVector.angle)}){
                 var numerator = 0.0
-                if denVector.angle >= numVector.angle{
-                    numerator = 180 - (denVector.angle - numVector.angle)
+                if nearestDenVector.angle >= numVector.angle{
+                    numerator = 180 - (nearestDenVector.angle - numVector.angle)
                 } else {
-                    numerator = 180 - (numVector.angle - denVector.angle)
+                    numerator = 180 - (numVector.angle - nearestDenVector.angle)
                 }
                 totalPercentage = totalPercentage + (numerator / 180)
+                nearestDenVector.processed = true
             }
         }
         return totalPercentage / Double(denImg.vectors.count)
+    }
+    
+    
+    /// Finds the five nearest vectors from the sorted array's index.
+    /// - Parameters:
+    ///   - numIndex: The source of where all the nearest vectors are measured from.
+    ///   - sortedDenVectors: Vectors to measure their index distance
+    /// - Returns: The five nearest vectors from the index provided based.
+    class func findNearestVectors(from numIndex: Int, sortedDenVectors: [PixelVector]) -> [PixelVector]{
+        var nearestCount = 5
+        if sortedDenVectors.count <= nearestCount{
+            return sortedDenVectors
+        }
+        var leftSideIndex = numIndex
+        var rightSideIndex = numIndex
+        var nearestVectors: [PixelVector] = []
+        
+        while (nearestCount > 0) {
+            rightSideIndex += 1
+            if leftSideIndex >= 0{
+                nearestVectors.append(sortedDenVectors[leftSideIndex])
+                nearestCount -= 1
+            }
+            leftSideIndex -= 1
+            if rightSideIndex < sortedDenVectors.count && nearestCount > 0{
+                nearestVectors.append(sortedDenVectors[rightSideIndex])
+                nearestCount -= 1
+            }
+        }
+        return nearestVectors
     }
 }

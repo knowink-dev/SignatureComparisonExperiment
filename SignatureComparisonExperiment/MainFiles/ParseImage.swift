@@ -20,10 +20,10 @@ class ParseImage{
     
     /// Phase 3 Debug Image
     var imagePixelsPhase3: [[UInt32]]!
-    #endif
     
     /// Phase 4 Debug Image
     var imagePixelsPhase4: [[UInt32]]!
+    #endif
     
     /// Active Pixels used in phases 2-4
     var imagePixelsArray: [ImagePixel] = []
@@ -53,8 +53,8 @@ class ParseImage{
         #if DEBUG || FAKE_RELEASE
         imagePixelsPhase2 = imagePixelsPhase1
         imagePixelsPhase3 = imagePixelsPhase2
-        #endif
         imagePixelsPhase4 = imagePixelsPhase1
+        #endif
         
         let parsedImageObj = ParsedImage()
 
@@ -112,23 +112,26 @@ class ParseImage{
         
         //MARK: - Debug Info
         #if DEBUG || FAKE_RELEASE
+        let debugInterval = CFAbsoluteTimeGetCurrent()
         let secondsPhase1 = (String(format: "%.4f", phase1Interval))
         let secondsPhase2 = (String(format: "%.4f", phase2Interval))
         let secondsPhase3 = (String(format: "%.4f", phase3Interval))
         let secondsPhase4 = (String(format: "%.4f", phase4Interval))
         let totalTime = (String(format: "%.4f", phase1Interval + phase2Interval + phase3Interval + phase4Interval))
-        
+
         debugPrint("Phase1: \(secondsPhase1)")
         debugPrint("Phase2: \(secondsPhase2)")
         debugPrint("Phase3: \(secondsPhase3)")
         debugPrint("Phase4: \(secondsPhase4)")
-        debugPrint("Total: \(totalTime)")
-        debugPrint("")
-        
+        debugPrint("Parsing Time: \(totalTime)")
+
         parsedImageObj.debugImageDic[.phase1] = generateDebugImage(pixelArray: imagePixelsPhase1, cgImage: cgImage)
         parsedImageObj.debugImageDic[.phase2] = generateDebugImage(pixelArray: imagePixelsPhase2, cgImage: cgImage)
         parsedImageObj.debugImageDic[.phase3] = generateDebugImage(pixelArray: imagePixelsPhase3, cgImage: cgImage)
         parsedImageObj.debugImageDic[.phase4] = generateDebugImage(pixelArray: imagePixelsPhase4, cgImage: cgImage)
+        let debugTime = Double(CFAbsoluteTimeGetCurrent() - debugInterval)
+        debugPrint("Debug Time: \(debugTime)")
+        debugPrint("")
         #endif
         
         return .success(parsedImageObj)
@@ -154,7 +157,7 @@ private extension ParseImage{
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         var bitmapInfo: UInt32 = CGBitmapInfo.byteOrder32Little.rawValue
         bitmapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
-
+        
         guard let imageContext = CGContext(data: imageDataMemoryAllocation,
                                            width: width,
                                            height: height,
@@ -165,7 +168,7 @@ private extension ParseImage{
               let buffer = imageContext.data?.bindMemory(to: UInt32.self,
                                                          capacity: imageData.count)
         else { return nil}
-
+        
         for index in 0 ..< width * height {
             buffer[index] = imageData[index]
         }
@@ -220,6 +223,7 @@ class PixelVector{
     var pixelPath: [ImagePixel] = []
     var angle: Double = 0.0
     var processed = false
+    var minXPos: Int!
     var startPixel: ImagePixel!
     var endPixel: ImagePixel!{
         didSet{
@@ -237,13 +241,14 @@ class PixelVector{
             } else{
                 angle = (atan((Double(secondPixel.yPos) - Double(firstPixel.yPos)) / (Double(secondPixel.xPos) - Double(firstPixel.xPos))) * (180 / Double.pi)) + 90
             }
+            minXPos = (startPixel.xPos < endPixel.xPos) ? startPixel.xPos : endPixel.xPos
         }
     }
 }
 
 class ImagePixel{
-    var color: PixelColor = .clear
-    var debugColor: PixelColor?
+    var color: PixelColor!
+    var debugColor: PixelColor!
     var xPos: Int
     var yPos: Int
     var pixelStatus: PixelStatus = .normal
@@ -308,6 +313,7 @@ class ImagePixel{
     
     init(_ color: PixelColor, xPos: Int, yPos: Int) {
         self.color = color
+        self.debugColor = color
         self.xPos = xPos
         self.yPos = yPos
     }

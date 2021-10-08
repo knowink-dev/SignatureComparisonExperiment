@@ -20,20 +20,23 @@ internal extension ParseImage{
         let brown = PixelColor.brown.rawValue
         let deletedStatus = PixelStatus.deleted
         for currentPixel in imagePixelsArray{
-            if (currentPixel.xPos > 0 && currentPixel.xPos < xPositionBoundary)
-                && (currentPixel.yPos > 0 && currentPixel.yPos < yPositionBoundary) {
-                /* DELETE Current Pixel if pixel has neighbor pixel to the right.
-                    ex:    @ - *
-                */
-                if imagePixelsPhase1[currentPixel.yPos][currentPixel.xPos + 1] == black {
-                    currentPixel.color = white
-                    currentPixel.pixelStatus = deletedStatus
-                    #if DEBUG || FAKE_RELEASE
-                    imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = brown
-                    #endif
-                }
+            /* DELETE Current Pixel if pixel has neighbor pixel to the right.
+                ex:    @ - *
+            */
+            if imagePixelsPhase1[currentPixel.yPos][currentPixel.xPos + 1] == black {
+                currentPixel.color = white
+                currentPixel.pixelStatus = deletedStatus
+                currentPixel.debugColor = .brown
+                #if DEBUG || FAKE_RELEASE
+                imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = brown
+                #endif
+            } else {
+                currentPixel.color = .black
+                currentPixel.debugColor = .black
+                currentPixel.pixelStatus = .normal
+                imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = black
+                
             }
-
             setPixelNeighbors(
                 pixelImageMap,
                 currentPixel.xPos,
@@ -62,35 +65,35 @@ internal extension ParseImage{
         _ currentPixel: ImagePixel) {
         
         if x != 0 && y != 0{
-            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y - 1)]
+            currentPixel.topLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y - 1)] ?? ImagePixel(.white, xPos: x - 1, yPos: y - 1)
         }
         
         if y != 0{
-            currentPixel.topPix = imgPixels[PixelCoordinate(x: x, y: y - 1)]
+            currentPixel.topPix = imgPixels[PixelCoordinate(x: x, y: y - 1)] ?? ImagePixel(.white, xPos: x, yPos: y - 1)
         }
         
         if x < xMax && y != 0{
-            currentPixel.topRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y - 1)]
+            currentPixel.topRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y - 1)] ?? ImagePixel(.white, xPos: x + 1, yPos: y - 1)
         }
         
         if x < xMax{
-            currentPixel.rightPix = imgPixels[PixelCoordinate(x: x + 1, y: y)]
+            currentPixel.rightPix = imgPixels[PixelCoordinate(x: x + 1, y: y)] ?? ImagePixel(.white, xPos: x + 1, yPos: y)
         }
         
         if x < xMax && y < yMax{
-            currentPixel.bottomRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y + 1)]
+            currentPixel.bottomRightPix = imgPixels[PixelCoordinate(x: x + 1, y: y + 1)] ?? ImagePixel(.white, xPos: x + 1, yPos: y + 1)
         }
         
         if y < yMax{
-            currentPixel.bottomPix = imgPixels[PixelCoordinate(x: x, y: y + 1)]
+            currentPixel.bottomPix = imgPixels[PixelCoordinate(x: x, y: y + 1)] ?? ImagePixel(.white, xPos: x, yPos: y + 1)
         }
         
         if x != 0 && y < yMax{
-            currentPixel.bottomLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y + 1)]
+            currentPixel.bottomLeftPix = imgPixels[PixelCoordinate(x: x - 1, y: y + 1)] ?? ImagePixel(.white, xPos: x - 1, yPos: y + 1)
         }
         
         if x != 0 {
-            currentPixel.leftPix = imgPixels[PixelCoordinate(x: x - 1, y: y)]
+            currentPixel.leftPix = imgPixels[PixelCoordinate(x: x - 1, y: y)] ?? ImagePixel(.white, xPos: x - 1, yPos: y)
         }
     }
 }

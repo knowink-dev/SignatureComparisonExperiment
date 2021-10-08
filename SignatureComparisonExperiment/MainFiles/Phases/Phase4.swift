@@ -26,11 +26,15 @@ internal extension ParseImage{
                 let vector = PixelVector()
                 vector.startPixel = currentPixel
                 currentPixel.pixelStatus = .processed
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase4[currentPixel.yPos][currentPixel.xPos] = PixelColor.red.rawValue
-                processLine(pixelImage: currentPixel, line: vector, &imagePixelsPhase4)
+                #endif
+                processLine(pixelImage: currentPixel, line: vector)
                 let lastPixel = vector.pixelPath.last
                 vector.endPixel = lastPixel
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase4[lastPixel?.yPos ?? 0][lastPixel?.xPos ?? 0] = PixelColor.green.rawValue
+                #endif
                 if vector.pixelPath.count > vectorTrimmer{
                     vectors.append(vector)
                 }
@@ -45,31 +49,19 @@ internal extension ParseImage{
     /// - Parameters:
     ///   - pixelImage: Current Pixel being processed.
     ///   - line: Collection of the pixels being processed to form a curved line.
-    ///   - imgPixels: Image pixel map of phase 4 to create a viewable image of phase 4 in debug mode.
     func processLine(pixelImage: ImagePixel?,
-                     line: PixelVector,
-                     _ imgPixels: inout [[UInt32]]){
-        
+                     line: PixelVector){
         guard let currentPixel = pixelImage else { return }
         let currentNeighbors = currentPixel.neighbors
         if currentNeighbors.count > 0 {
-            let nextNeighbor = currentPixel.neighbors.filter({$0.color == .black && $0.pixelStatus != .processed})
-            if nextNeighbor.count == 1{
-                guard let pixelToProcess = nextNeighbor.first else {
-                    debugPrint("Process Line Error: Could not access first neighboring pixel.")
-                    return
-                }
-                pixelToProcess.pixelStatus = .processed
-                imgPixels[pixelToProcess.yPos][pixelToProcess.xPos] = PixelColor.darkBlue.rawValue
-                line.pixelPath.append(pixelToProcess)
-                processLine(pixelImage: pixelToProcess, line: line, &imgPixels)
-            } else if nextNeighbor.count == 0{
-                return
-            } else{
-                debugPrint("Process Line Error: Pixel had more than one neighbor.")
+            if let nextNeighbor = currentNeighbors.first(where: {$0.pixelStatus != .processed && $0.color == .black}){
+                nextNeighbor.pixelStatus = .processed
+                #if DEBUG || FAKE_RELEASE
+                imagePixelsPhase4[nextNeighbor.yPos][nextNeighbor.xPos] = PixelColor.darkBlue.rawValue
+                #endif
+                line.pixelPath.append(nextNeighbor)
+                processLine(pixelImage: nextNeighbor, line: line)
             }
-        } else {
-            return
         }
     }
 }

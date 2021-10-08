@@ -438,7 +438,7 @@ internal extension ParseImage{
                    restoredRightCount < 2{
                     currentPixel.color = .white
                     currentPixel.debugColor = .gold
-                    currentPixel.pixelStatus = .deleted
+                    currentPixel.pixelStatus = .permanentlyDeleted
                     #if DEBUG || FAKE_RELEASE
                     imagePixelsPhase3[currentPixel.yPos][currentPixel.xPos] = PixelColor.gold.rawValue
                     #endif
@@ -497,17 +497,17 @@ internal extension ParseImage{
         if let pix11 = currentPixel.bottomPix?.bottomLeftPix, pix11.color == .black{
             intersectingPixels.append(pix11)
         }
-        if let pix14 = currentPixel.bottomLeftPix?.bottomLeftPix, pix14.color == .black{
+        if let pix12 = currentPixel.bottomLeftPix?.bottomLeftPix, pix12.color == .black{
+            intersectingPixels.append(pix12)
+        }
+        if let pix13 = currentPixel.leftPix?.bottomLeftPix, pix13.color == .black{
+            intersectingPixels.append(pix13)
+        }
+        if let pix14 = currentPixel.leftPix?.leftPix, pix14.color == .black{
             intersectingPixels.append(pix14)
         }
-        if let pix15 = currentPixel.leftPix?.bottomLeftPix, pix15.color == .black{
+        if let pix15 = currentPixel.leftPix?.topLeftPix, pix15.color == .black{
             intersectingPixels.append(pix15)
-        }
-        if let pix16 = currentPixel.leftPix?.leftPix, pix16.color == .black{
-            intersectingPixels.append(pix16)
-        }
-        if let pix17 = currentPixel.leftPix?.topLeftPix, pix17.color == .black{
-            intersectingPixels.append(pix17)
         }
         
         //TODO: Fix this. . . This is a really ugly solution and needs a better approach to check whether one list contains an elemnt from another list.
