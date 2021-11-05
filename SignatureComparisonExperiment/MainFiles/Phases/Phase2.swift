@@ -34,8 +34,9 @@ internal extension ParseImage{
                 currentPixel.color = .black
                 currentPixel.debugColor = .black
                 currentPixel.pixelStatus = .normal
+                #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase2[currentPixel.yPos][currentPixel.xPos] = black
-                
+                #endif
             }
             setPixelNeighbors(
                 pixelImageMap,
