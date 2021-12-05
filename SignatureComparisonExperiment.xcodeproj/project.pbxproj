@@ -48,6 +48,8 @@
 		2D392C1726FCD1A600CAA1AD /* MetalController.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MetalController.metal; sourceTree = "<group>"; };
 		2D392C1826FCD1A600CAA1AD /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		2D392C1D26FCD58800CAA1AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		2D535F3E275D0FBD0062A226 /* ComparisonView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ComparisonView.xib; sourceTree = "<group>"; };
+		2D535F3F275D0FBD0062A226 /* ComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				2D392C0326FCD0F000CAA1AD /* MainFiles */,
+				2D535F3D275D0D5D0062A226 /* CustomViews */,
 				2D392C0626FCD14500CAA1AD /* MetalFiles */,
 				2D392BEE26FCD0D700CAA1AD /* AppDelegate.swift */,
 				2D392BF026FCD0D700CAA1AD /* SceneDelegate.swift */,
@@ -133,6 +136,15 @@
 				2D392C0D26FCD17B00CAA1AD /* DropDownView.swift */,
 			);
 			path = HelperFiles;
+			sourceTree = "<group>";
+		};
+		2D535F3D275D0D5D0062A226 /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				2D535F3F275D0FBD0062A226 /* ComparisonView.swift */,
+				2D535F3E275D0FBD0062A226 /* ComparisonView.xib */,
+			);
+			path = CustomViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
