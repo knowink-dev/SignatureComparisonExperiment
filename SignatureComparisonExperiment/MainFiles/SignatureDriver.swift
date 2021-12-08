@@ -1,11 +1,9 @@
 //
 //  SignatureDriver.swift
-//  MetalAndImages
 //
 //  Created by Paul Mayer on 8/16/21.
 //
 
-import Foundation
 import UIKit
 
 
@@ -22,7 +20,6 @@ public class SignatureDriver{
         case emptyParsedImages
     }
     
-    
     /// Public fucntion to compare two signatures together and provide a confidence level of how similar the images are.
     /// - Parameters:
     ///   - primarySignature: Source image to compare against.
@@ -32,16 +29,18 @@ public class SignatureDriver{
         _ primarySignature: UIImage,
         _ secondarySignature: UIImage,
         _ handler: @escaping (Swift.Result<Double, Error>) -> Void) {
-            compareSignatures(
-                primarySignature,
-                secondarySignature) { result, parsedImages in
-                    handler(result)
-                }
+        compareSignatures(
+            primarySignature,
+            secondarySignature) { result, parsedImages in
+            handler(result)
         }
+    }
     
-    /// WARNING: THIS FUNCTION SHOULD ONLY BE USED IN DEBUG MODE! (NEVER IN RELEASE MODE). This is a public fucntion to compare two signatures together and show a popup view with the four image phases that each signature goes through to create a confidence score.
+    /// WARNING: THIS FUNCTION SHOULD ONLY BE USED IN DEBUG MODE! (NEVER IN RELEASE MODE).
+    /// This is a public fucntion to compare two signatures together and show a popup view with the four image phases
+    /// that each signature goes through to create a confidence score.
     /// - Parameters:
-    ///   - currentVC: Source image to compare against.
+    ///   - currentVC: Source view controller showing this popup.
     ///   - primarySignature: Source image to compare against.
     ///   - secondarySignature: Secondary image that is compared against the source image.
     ///   - handler: Callback value providing the signature comparison percentage, and an error if one or more occured.
@@ -49,48 +48,51 @@ public class SignatureDriver{
         _ currentVC: UIViewController,
         _ primarySignature: UIImage,
         _ secondarySignature: UIImage){
+        
+        let comparisonView = ComparisonView()
+        comparisonView.parentVC = currentVC
+        comparisonView.backgroundColor = UIColor.YellowLime().withAlphaComponent(0.85)
+        comparisonView.frame = currentVC.view.frame
+        currentVC.view.addSubview(comparisonView)
+        currentVC.view.isUserInteractionEnabled = false
+        comparisonView.isUserInteractionEnabled = false
+        comparisonView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        comparisonView.loadView()
+        
+        compareSignatures(
+            primarySignature,
+            secondarySignature) { result, parsedImages in
             
-            let comparisonView = ComparisonView()
-            comparisonView.parentVC = currentVC
-            comparisonView.frame = currentVC.view.frame
-            currentVC.view.addSubview(comparisonView)
-            currentVC.view.isUserInteractionEnabled = false
-            comparisonView.isUserInteractionEnabled = false
-            
-            compareSignatures(
-                primarySignature,
-                secondarySignature) { result, parsedImages in
-                    
-                    DispatchQueue.main.async {
-                        comparisonView.loadingIndicator.stopAnimating()
-                        comparisonView.isUserInteractionEnabled = true
-                        currentVC.view.isUserInteractionEnabled = true
-                        
-                        switch result{
-                        case .success(let percentage):
-                            if let parsedImgs = parsedImages, parsedImgs.count > 0{
-                                if let topImg = parsedImgs.first, let bottomImg = parsedImages?.last{
-                                    comparisonView.currentTopParsedImgObj = topImg
-                                    comparisonView.topImgView.image = comparisonView.currentTopParsedImgObj?.debugImageDic[.phase4]
-                                    comparisonView.currentBottomParsedImgObj = bottomImg
-                                    comparisonView.topScrollView.zoomScale = 1.0
-                                    comparisonView.bottomImgView.image = comparisonView.currentBottomParsedImgObj?.debugImageDic[.phase4]
-                                    comparisonView.bottomScrollView.zoomScale = 1.0
-                                    comparisonView.showAlert(message: "\(Int(round(percentage * 100)))% Match")
-                                } else {
-                                    comparisonView.showAlert(message: "Unable to get parsed image objects.")
-                                }
-                            } else {
-                                comparisonView.showAlert(message: "Unable to receive image objects.")
-                            }
-                        case .failure(let error):
-                            comparisonView.showAlert(message: error.localizedDescription)
+            DispatchQueue.main.async {
+                comparisonView.loadingIndicator.stopAnimating()
+                comparisonView.isUserInteractionEnabled = true
+                currentVC.view.isUserInteractionEnabled = true
+                
+                switch result{
+                case .success(let percentage):
+                    if let parsedImgs = parsedImages, parsedImgs.count > 0{
+                        if let topImg = parsedImgs.first, let bottomImg = parsedImages?.last{
+                            comparisonView.currentTopParsedImgObj = topImg
+                            comparisonView.topImgView.image = comparisonView.currentTopParsedImgObj?.debugImageDic[.phase4]
+                            comparisonView.currentBottomParsedImgObj = bottomImg
+                            comparisonView.topScrollView.zoomScale = 1.0
+                            comparisonView.bottomImgView.image = comparisonView.currentBottomParsedImgObj?.debugImageDic[.phase4]
+                            comparisonView.bottomScrollView.zoomScale = 1.0
+                            comparisonView.showAlert(message: "\(Int(round(percentage * 100)))% Match")
+                        } else {
+                            comparisonView.showAlert(message: "Unable to get parsed image objects.")
                         }
+                    } else {
+                        comparisonView.showAlert(message: "Unable to receive image objects.")
                     }
+                case .failure(let error):
+                    comparisonView.showAlert(message: error.localizedDescription)
                 }
+            }
         }
+    }
     
-    
+
     /// Project specfific function that spins off separate image parsing operations and calculates the confidence score based on the vectors and angles that are returned.
     /// - Parameters:
     ///   - primarySignature: Source image to compare against

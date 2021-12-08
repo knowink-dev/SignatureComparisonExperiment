@@ -25,6 +25,7 @@
 		2D392C3226FCD74500CAA1AD /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D392C0D26FCD17B00CAA1AD /* DropDownView.swift */; };
 		2D392C3626FCD74C00CAA1AD /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D392C0A26FCD17B00CAA1AD /* Colors.swift */; };
 		2D392C3826FCD74E00CAA1AD /* CBImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D392C0B26FCD17B00CAA1AD /* CBImageView.swift */; };
+		2D535F40275D11CB0062A226 /* ComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D535F3F275D0FBD0062A226 /* ComparisonView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,7 +49,6 @@
 		2D392C1726FCD1A600CAA1AD /* MetalController.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MetalController.metal; sourceTree = "<group>"; };
 		2D392C1826FCD1A600CAA1AD /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		2D392C1D26FCD58800CAA1AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		2D535F3E275D0FBD0062A226 /* ComparisonView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ComparisonView.xib; sourceTree = "<group>"; };
 		2D535F3F275D0FBD0062A226 /* ComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -142,7 +142,6 @@
 			isa = PBXGroup;
 			children = (
 				2D535F3F275D0FBD0062A226 /* ComparisonView.swift */,
-				2D535F3E275D0FBD0062A226 /* ComparisonView.xib */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -222,6 +221,7 @@
 				2D392C3226FCD74500CAA1AD /* DropDownView.swift in Sources */,
 				2D392C2626FCD72600CAA1AD /* Phase2.swift in Sources */,
 				2D392C2726FCD72600CAA1AD /* Phase1.swift in Sources */,
+				2D535F40275D11CB0062A226 /* ComparisonView.swift in Sources */,
 				2D392C3826FCD74E00CAA1AD /* CBImageView.swift in Sources */,
 				2D392C2526FCD72600CAA1AD /* Phase4.swift in Sources */,
 				2D392BF326FCD0D700CAA1AD /* ViewController.swift in Sources */,
