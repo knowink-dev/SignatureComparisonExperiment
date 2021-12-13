@@ -64,16 +64,25 @@ class ParseImage{
         var phase1Interval: Double = 0
         #endif
         
-        if cgImage.colorSpace?.model == .rgb || cgImage.colorSpace?.model == .monochrome{
+        if cgImage.colorSpace?.model == .rgb{
             #if DEBUG || FAKE_RELEASE
             phaseOneStart = CFAbsoluteTimeGetCurrent()
             #endif
             
-            parseImagePhase1(cgImage, bytes)
+            parseRgbImagePhase1(cgImage, bytes)
             #if DEBUG || FAKE_RELEASE
             phase1Interval = Double(CFAbsoluteTimeGetCurrent() - phaseOneStart)
             #endif
             
+        } else if cgImage.colorSpace?.model == .monochrome{
+            #if DEBUG || FAKE_RELEASE
+            phaseOneStart = CFAbsoluteTimeGetCurrent()
+            #endif
+            
+            parseMonochromeImagePhase1(cgImage, bytes)
+            #if DEBUG || FAKE_RELEASE
+            phase1Interval = Double(CFAbsoluteTimeGetCurrent() - phaseOneStart)
+            #endif
         } else{
             return .failure(.invalidImageSupplied("Image is not in the correct format. Acceptable formats include RGBA and MonoChrome"))
         }
