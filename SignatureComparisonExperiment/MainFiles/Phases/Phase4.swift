@@ -25,15 +25,27 @@ internal extension ParseImage{
 
                 let vector = PixelVector()
                 vector.startPixel = currentPixel
+                vector.pixelPath.append(currentPixel)
                 currentPixel.pixelStatus = .processed
                 #if DEBUG || FAKE_RELEASE
                 imagePixelsPhase4[currentPixel.yPos][currentPixel.xPos] = PixelColor.red.rawValue
                 #endif
-                processLine(pixelImage: currentPixel, line: vector)
-                let lastPixel = vector.pixelPath.last
-                vector.endPixel = lastPixel
+                var neighbors = currentPixel.neighbors
+                while (!neighbors.isEmpty){
+                    if let nextNeighbor = neighbors.first(where: {$0.pixelStatus != .processed && $0.color == .black}){
+                        nextNeighbor.pixelStatus = .processed
+                        neighbors = nextNeighbor.neighbors
+                        #if DEBUG || FAKE_RELEASE
+                        imagePixelsPhase4[nextNeighbor.yPos][nextNeighbor.xPos] = PixelColor.darkBlue.rawValue
+                        #endif
+                        vector.pixelPath.append(nextNeighbor)
+                    } else {
+                        neighbors = []
+                    }
+                }
+                vector.endPixel = vector.pixelPath.last
                 #if DEBUG || FAKE_RELEASE
-                imagePixelsPhase4[lastPixel?.yPos ?? 0][lastPixel?.xPos ?? 0] = PixelColor.green.rawValue
+                imagePixelsPhase4[vector.endPixel?.yPos ?? 0][vector.endPixel?.xPos ?? 0] = PixelColor.green.rawValue
                 #endif
                 if vector.pixelPath.count > vectorTrimmer{
                     vectors.append(vector)
@@ -42,27 +54,6 @@ internal extension ParseImage{
             }
         }
         return (vectors)
-    }
-    
-    
-    /// Recursive function that processes the current pixel and then moves on to the next neighboring pixel if one exists.
-    /// - Parameters:
-    ///   - pixelImage: Current Pixel being processed.
-    ///   - line: Collection of the pixels being processed to form a curved line.
-    func processLine(pixelImage: ImagePixel?,
-                     line: PixelVector){
-        guard let currentPixel = pixelImage else { return }
-        let currentNeighbors = currentPixel.neighbors
-        if currentNeighbors.count > 0 {
-            if let nextNeighbor = currentNeighbors.first(where: {$0.pixelStatus != .processed && $0.color == .black}){
-                nextNeighbor.pixelStatus = .processed
-                #if DEBUG || FAKE_RELEASE
-                imagePixelsPhase4[nextNeighbor.yPos][nextNeighbor.xPos] = PixelColor.darkBlue.rawValue
-                #endif
-                line.pixelPath.append(nextNeighbor)
-                processLine(pixelImage: nextNeighbor, line: line)
-            }
-        }
     }
 }
 
